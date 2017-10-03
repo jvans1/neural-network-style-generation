@@ -7,15 +7,22 @@ import pdb
 
 mean   = [0.485, 0.456, 0.406]
 stddev = [0.229, 0.224, 0.225]
-def top(img):
-    return img[:,:-91, :]
+class Truncate():
+    def __init__(self, length):
+        self.length = length
 
-folder = ImageFolder("data/", transforms.Compose([
-    transforms.Scale(224),
-    transforms.ToTensor(),
-    transforms.Lambda(top),
-    transforms.Normalize(mean=mean, std=stddev),
-]))
+    def truncate(self, img):
+        return img[:,:-self.length, :]
+
+def get_image(index, truncate_length):
+    truncater = Truncate(truncate_length)
+    lam = lambda img: truncater.truncate(img)
+    return ImageFolder("data/", transforms.Compose([
+        transforms.Scale(224),
+        transforms.ToTensor(),
+        transforms.Lambda(lam),
+        transforms.Normalize(mean=mean, std=stddev),
+    ]))[index][0]
 
 def unnormalize(img):
     #match dimensions (3,) -> (3,1,1)
