@@ -1,4 +1,6 @@
 import torch
+from collections import OrderedDict
+import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 from torchvision.datasets import ImageFolder
@@ -7,6 +9,17 @@ import pdb
 
 mean   = [0.485, 0.456, 0.406]
 stddev = [0.229, 0.224, 0.225]
+
+def convert_to_average_pooling(modules):
+    layers = []
+    for i, layer in enumerate(modules):
+        layer_name = "layer_"+str(i)
+        if type(layer) is torch.nn.modules.pooling.MaxPool2d:
+            layers.append((layer_name, nn.AvgPool2d((2, 2))))
+        else:
+            layers.append((layer_name, layer))
+    return nn.Sequential(OrderedDict(layers))
+
 class Truncate():
     def __init__(self, length):
         self.length = length
