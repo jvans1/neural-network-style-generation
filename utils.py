@@ -27,15 +27,20 @@ class Truncate():
     def truncate(self, img):
         return img[:,:-self.length, :]
 
+def load_raw(index):
+    return ImageFolder("data/")[index][0]
+
 def get_image(index, truncate_length):
-    truncater = Truncate(truncate_length)
-    lam = lambda img: truncater.truncate(img)
-    return ImageFolder("data/", transforms.Compose([
+    tfs = [
         transforms.Scale(224),
         transforms.ToTensor(),
-        transforms.Lambda(lam),
         transforms.Normalize(mean=mean, std=stddev),
-    ]))[index][0]
+    ]
+    if truncate_length is not None:
+        truncater = Truncate(truncate_length)
+        lam = lambda img: truncater.truncate(img)
+        tfs.append(lam)
+    return ImageFolder("data/", transforms.Compose(tfs))[index][0]
 
 def unnormalize(img):
     #match dimensions (3,) -> (3,1,1)
@@ -43,9 +48,14 @@ def unnormalize(img):
     shaped_mean =  torch.Tensor(mean).unsqueeze(1).unsqueeze(1)
     return img * shaped_std + shaped_mean
 
-def imshow(img):
+def format_display(img):
     img = unnormalize(img)
+    print(img)
     img = img.numpy()
-    plt.imshow(np.transpose(img, (1,2,0)))
+    print(img)
+    return np.transpose(img, (1,2,0))
+
+def imshow(img):
+    plt.imshow(format_display(img))
 
 
