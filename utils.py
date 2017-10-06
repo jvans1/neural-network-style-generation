@@ -27,10 +27,14 @@ class Truncate():
     def truncate(self, img):
         return img[:,:-self.length, :]
 
+    def side_length(self, img):
+        return img[:, :, :-self.length]
+
+
 def load_raw(index):
     return ImageFolder("data/")[index][0]
 
-def get_image(index, truncate_length):
+def get_image(index, truncate_length, side_length = None):
     tfs = [
         transforms.Scale(224),
         transforms.ToTensor(),
@@ -39,6 +43,10 @@ def get_image(index, truncate_length):
     if truncate_length is not None:
         truncater = Truncate(truncate_length)
         lam = lambda img: truncater.truncate(img)
+        tfs.append(lam)
+    if side_length is not None:
+        truncater = Truncate(side_length)
+        lam = lambda img: truncater.side_length(img)
         tfs.append(lam)
     return ImageFolder("data/", transforms.Compose(tfs))[index][0]
 
@@ -50,9 +58,7 @@ def unnormalize(img):
 
 def format_display(img):
     img = unnormalize(img)
-    print(img)
     img = img.numpy()
-    print(img)
     return np.transpose(img, (1,2,0))
 
 def imshow(img):
