@@ -62,6 +62,11 @@ def format_display(img):
     return np.transpose(img, (1,2,0))
 
 def imshow(img):
+    img = img.clone().cpu()
     plt.imshow(format_display(img))
 
+
+def freeze_model(model):
+    for param in model.parameters():
+        param.requires_grad = False
 
