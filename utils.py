@@ -38,7 +38,7 @@ def get_image(index, truncate_length, side_length = None):
     tfs = [
         transforms.Scale(224),
         transforms.ToTensor(),
-        transforms.Normalize(mean=mean, std=stddev),
+        #  transforms.Normalize(mean=mean, std=stddev),
     ]
     if truncate_length is not None:
         truncater = Truncate(truncate_length)
@@ -56,14 +56,13 @@ def unnormalize(img):
     shaped_mean =  torch.Tensor(mean).unsqueeze(1).unsqueeze(1)
     return img * shaped_std + shaped_mean
 
-def format_display(img):
-    img = unnormalize(img)
-    img = img.numpy()
-    return np.transpose(img, (1,2,0))
 
+unloader = transforms.ToPILImage()
 def imshow(img):
     img = img.clone().cpu()
-    plt.imshow(format_display(img))
+    img = unloader(img)
+    print(img)
+    plt.imshow(img)
 
 
 def freeze_model(model):
