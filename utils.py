@@ -61,7 +61,6 @@ unloader = transforms.ToPILImage()
 def imshow(img):
     img = img.clone().cpu()
     img = unloader(img)
-    print(img)
     plt.imshow(img)
 
 
