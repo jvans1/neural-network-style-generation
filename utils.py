@@ -21,11 +21,12 @@ class Truncate():
 def load_raw(index):
     return ImageFolder("data/")[index][0]
 
-def get_image(index, truncate_length, side_length = None):
+def get_image(index, truncate_length, side_length = None, transform_size = None):
     tfs = [
-        transforms.Scale(224),
         transforms.ToTensor(),
     ]
+    if transform_size is not None:
+        tfs.insert(0, transforms.Scale(transform_size))
     if truncate_length is not None:
         truncater = Truncate(truncate_length)
         lam = lambda img: truncater.truncate(img)
